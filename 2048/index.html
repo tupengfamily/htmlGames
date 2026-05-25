@@ -23,6 +23,7 @@
         </div>
         <div class="controls">
             <button id="new-game-btn">新游戏</button>
+            <button id="history-btn">历史记录</button>
         </div>
         <div class="game-container">
             <div id="game-board"></div>
@@ -37,5 +38,14 @@
         </div>
     </div>
     <script src="game.js"></script>
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>最近十次游戏记录</h2>
+                <button id="close-history" class="close-btn">&times;</button>
+            </div>
+            <div id="history-list" class="history-list"></div>
+        </div>
+    </div>
 </body>
 </html>

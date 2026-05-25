@@ -48,6 +48,11 @@ class Game2048 {
         document.addEventListener('keydown', (e) => this.handleKeydown(e));
         document.getElementById('new-game-btn').addEventListener('click', () => this.newGame());
         document.getElementById('retry-btn').addEventListener('click', () => this.retry());
+        document.getElementById('history-btn').addEventListener('click', () => this.showHistory());
+        document.getElementById('close-history').addEventListener('click', () => this.hideHistory());
+        document.getElementById('history-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) this.hideHistory();
+        });
     }
 
     newGame() {
@@ -78,6 +83,49 @@ class Game2048 {
             won: this.won
         };
         localStorage.setItem('gameState', JSON.stringify(state));
+    }
+
+    saveHistory(isWin) {
+        const history = JSON.parse(localStorage.getItem('gameHistory') || '[]');
+        const record = {
+            date: new Date().toLocaleString('zh-CN'),
+            score: this.score,
+            result: isWin ? '胜利' : '失败',
+            maxTile: Math.max(...this.board.flat())
+        };
+        history.unshift(record);
+        if (history.length > 10) history.pop();
+        localStorage.setItem('gameHistory', JSON.stringify(history));
+    }
+
+    getHistory() {
+        return JSON.parse(localStorage.getItem('gameHistory') || '[]');
+    }
+
+    showHistory() {
+        const history = this.getHistory();
+        const modal = document.getElementById('history-modal');
+        const list = document.getElementById('history-list');
+        
+        if (history.length === 0) {
+            list.innerHTML = '<p class="no-history">暂无游戏记录</p>';
+        } else {
+            list.innerHTML = history.map((record, index) => `
+                <div class="history-item">
+                    <span class="history-rank">#${index + 1}</span>
+                    <span class="history-date">${record.date}</span>
+                    <span class="history-score">${record.score}分</span>
+                    <span class="history-result ${record.result === '胜利' ? 'win' : 'lose'}">${record.result}</span>
+                    <span class="history-tile">最大${record.maxTile}</span>
+                </div>
+            `).join('');
+        }
+        
+        modal.classList.add('active');
+    }
+
+    hideHistory() {
+        document.getElementById('history-modal').classList.remove('active');
     }
 
     handleKeydown(e) {
@@ -121,6 +169,7 @@ class Game2048 {
                     this.score += row[c];
                     if (row[c] === 2048 && !this.won) {
                         this.won = true;
+                        this.saveHistory(true);
                         this.showMessage('你赢了！', true);
                     }
                     row.splice(c + 1, 1);
@@ -145,6 +194,7 @@ class Game2048 {
             this.saveState();
             if (this.isGameOver()) {
                 this.gameOver = true;
+                this.saveHistory(false);
                 this.showMessage('游戏结束！');
                 this.saveState();
             }
