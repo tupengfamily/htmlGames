@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五子棋 - 国际比赛规则</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>五子棋</h1>
+            <div class="info">
+                <div class="player-info">
+                    <div class="player black">
+                        <span class="stone"></span>
+                        <span>黑棋</span>
+                        <span id="black-wins" class="wins">0胜</span>
+                    </div>
+                    <div class="player white">
+                        <span class="stone"></span>
+                        <span>白棋</span>
+                        <span id="white-wins" class="wins">0胜</span>
+                    </div>
+                </div>
+                <div class="turn-info">
+                    <span>当前回合：</span>
+                    <span id="turn-count">1</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <div id="status" class="status">黑棋落子</div>
+            <div class="controls">
+                <button id="new-game-btn">新游戏</button>
+                <button id="undo-btn">悔棋</button>
+                <button id="history-btn">历史记录</button>
+                <button id="rules-btn">详细规则</button>
+            </div>
+        </div>
+
+        <div class="mode-selector">
+            <h3>游戏模式</h3>
+            <div class="mode-options">
+                <button class="mode-btn active" data-mode="pvp">双人对战</button>
+                <button class="mode-btn" data-mode="pve-easy">人机对战（简单）</button>
+                <button class="mode-btn" data-mode="pve-medium">人机对战（中等）</button>
+                <button class="mode-btn" data-mode="pve-hard">人机对战（困难）</button>
+            </div>
+            <div class="ai-color-selector" id="ai-color-selector" style="display: none;">
+                <span>执棋颜色：</span>
+                <button class="color-btn active" data-color="black">执黑（先手）</button>
+                <button class="color-btn" data-color="white">执白（后手）</button>
+            </div>
+        </div>
+
+        <div class="board-container">
+            <div id="board" class="board"></div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>历史对局记录</h2>
+                <button id="close-history" class="close-btn">&times;</button>
+            </div>
+            <div id="history-list" class="history-list"></div>
+        </div>
+    </div>
+
+    <div id="forbidden-hint" class="forbidden-hint"></div>
+
+    <div id="rules-modal" class="modal">
+        <div class="modal-content rules-modal-content">
+            <div class="modal-header">
+                <h2>五子棋国际比赛规则详解</h2>
+                <button id="close-rules" class="close-btn">&times;</button>
+            </div>
+            <div class="rules-detail">
+                <section class="rule-section">
+                    <h3>一、基本规则</h3>
+                    <ul>
+                        <li><strong>棋盘：</strong>15×15标准棋盘，共225个交叉点</li>
+                        <li><strong>棋子：</strong>黑白两色棋子，黑棋先行</li>
+                        <li><strong>目标：</strong>先将五颗或五颗以上同色棋子连成一线（横、竖、斜均可）者获胜</li>
+                        <li><strong>平局：</strong>棋盘填满且无人获胜则为平局</li>
+                    </ul>
+                </section>
+
+                <section class="rule-section">
+                    <h3>二、禁手规则（仅限黑棋）</h3>
+                    <p class="rule-note">禁手是国际比赛规则中对先行方（黑棋）的限制，旨在平衡先后手优势。白棋无禁手限制。</p>
+                    
+                    <div class="forbidden-type">
+                        <h4>1. 三三禁手</h4>
+                        <p>黑棋落子后，同时在两个或两个以上方向形成<strong>活三</strong>。</p>
+                        <div class="forbidden-detail">
+                            <p><strong>活三定义：</strong>在一条直线上，连续三颗同色棋子，且两端均为 empty 位置，可以发展为活四。</p>
+                            <div class="forbidden-example">
+                                <p><strong>示例：</strong></p>
+                                <code>○○●●●○○</code>（●为黑棋，○为空位）<br>
+                                <code>表示在一行中，黑棋形成连续三子，两端都有空位</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="forbidden-type">
+                        <h4>2. 四四禁手</h4>
+                        <p>黑棋落子后，同时在两个或两个以上方向形成<strong>四</strong>（包括活四和冲四）。</p>
+                        <div class="forbidden-detail">
+                            <p><strong>四的定义：</strong></p>
+                            <ul>
+                                <li><strong>活四：</strong>连续四颗同色棋子，两端至少一端有空位</li>
+                                <li><strong>冲四：</strong>连续四颗同色棋子，只有一端有空位</li>
+                            </ul>
+                            <div class="forbidden-example">
+                                <p><strong>示例：</strong></p>
+                                <code>○●●●●○</code>（活四）<br>
+                                <code>✕●●●●○</code>（冲四，✕为边界或对方棋子）
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="forbidden-type">
+                        <h4>3. 长连禁手</h4>
+                        <p>黑棋落子后，形成<strong>五颗以上</strong>同色棋子连成一线。</p>
+                        <div class="forbidden-detail">
+                            <p><strong>说明：</strong>五连为获胜条件，但六连及以上为禁手。白棋长连不受限制，仍可获胜。</p>
+                            <div class="forbidden-example">
+                                <p><strong>示例：</strong></p>
+                                <code>●●●●●●</code>（六连，黑棋禁手）
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="rule-section">
+                    <h3>三、特殊规则</h3>
+                    <ul>
+                        <li><strong>禁手失效：</strong>如果黑棋的禁手位置同时能形成五连，则禁手失效，黑棋获胜</li>
+                        <li><strong>白棋无禁手：</strong>白棋不受三三、四四、长连限制，落子自由</li>
+                        <li><strong>悔棋：</strong>支持悔棋操作，可撤销上一步落子</li>
+                    </ul>
+                </section>
+
+                <section class="rule-section">
+                    <h3>四、操作说明</h3>
+                    <ul>
+                        <li><strong>落子：</strong>点击棋盘交叉点放置棋子</li>
+                        <li><strong>禁手提示：</strong>鼠标悬停在禁手位置时会显示红色提示</li>
+                        <li><strong>悔棋：</strong>点击"悔棋"按钮撤销上一步</li>
+                        <li><strong>新游戏：</strong>点击"新游戏"开始新的对局</li>
+                        <li><strong>历史记录：</strong>点击"历史记录"查看最近10局对局，支持回放</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
