@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>中国象棋</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>中国象棋</h1>
+        </div>
+
+        <div class="mode-selector">
+            <h3>游戏模式</h3>
+            <div class="mode-options">
+                <button class="mode-btn active" data-mode="pvp">人人对战</button>
+                <button class="mode-btn" data-mode="pve">人机对战</button>
+            </div>
+            <div class="ai-side-selector" id="ai-side-selector" style="display: none;">
+                <span>执子方：</span>
+                <button class="side-btn active" data-side="black">黑方（AI先手）</button>
+                <button class="side-btn" data-side="red">红方（玩家先手）</button>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <div class="player-indicator">
+                <span id="red-player" class="side-tag red-tag active-turn">红方</span>
+                <span id="status" class="status">红方走棋</span>
+                <span id="black-player" class="side-tag black-tag">黑方</span>
+            </div>
+            <div class="controls">
+                <button id="new-game-btn">新游戏</button>
+                <button id="undo-btn">悔棋</button>
+                <button id="rules-btn">游戏规则</button>
+                <button id="history-btn">历史记录</button>
+            </div>
+        </div>
+
+        <div class="board-container">
+            <canvas id="board-canvas"></canvas>
+        </div>
+    </div>
+
+    <div id="rules-modal" class="modal">
+        <div class="modal-content rules-modal-content">
+            <div class="modal-header">
+                <h2>中国象棋规则说明</h2>
+                <button id="close-rules" class="close-btn">&times;</button>
+            </div>
+            <div class="rules-detail">
+                <section class="rule-section">
+                    <h3>棋盘与棋子</h3>
+                    <div class="rule-grid">
+                        <div class="rule-item">
+                            <div class="rule-text">
+                                <strong>棋盘</strong>
+                                <span>9列10行，共90个交叉点。中间河界将棋盘分为南北两方。九宫位于双方底线中央。</span>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <div class="rule-text">
+                                <strong>棋子</strong>
+                                <span>红方：帅、仕、相、馬、車、炮、兵（红字）<br>黑方：将、士、象、马、车、砲、卒（黑字）</span>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <div class="rule-text">
+                                <strong>红先黑后</strong>
+                                <span>红方先行，双方交替走棋。将死对方将/帅者胜。</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="rule-section">
+                    <h3>棋子走法</h3>
+
+                    <div class="piece-rules">
+                        <div class="piece-rule">
+                            <div class="piece-icon red-piece-demo">帅</div>
+                            <div class="piece-desc">
+                                <strong>将 / 帅</strong>
+                                <p>在九宫内沿横线或竖线走一步。将帅不能在同一直线上对面（中间无子遮挡）。</p>
+                            </div>
+                        </div>
+                        <div class="piece-rule">
+                            <div class="piece-icon red-piece-demo">仕</div>
+                            <div class="piece-desc">
+                                <strong>士 / 仕</strong>
+                                <p>在九宫内沿斜线走一步。</p>
+                            </div>
+                        </div>
+                        <div class="piece-rule">
+                            <div class="piece-icon red-piece-demo">相</div>
+                            <div class="piece-desc">
+                                <strong>象 / 相</strong>
+                                <p>走"田"字（对角线两步），不能过河。若"田"字中央有棋子则不能走（塞象眼）。</p>
+                            </div>
+                        </div>
+                        <div class="piece-rule">
+                            <div class="piece-icon red-piece-demo">馬</div>
+                            <div class="piece-desc">
+                                <strong>马</strong>
+                                <p>走"日"字（先直行一步再斜行一步）。若直行方向有棋子则不能走（蹩马脚）。</p>
+                            </div>
+                        </div>
+                        <div class="piece-rule">
+                            <div class="piece-icon red-piece-demo">車</div>
+                            <div class="piece-desc">
+                                <strong>车</strong>
+                                <p>沿横线或竖线行走任意步数，不能越过其他棋子。</p>
+                            </div>
+                        </div>
+                        <div class="piece-rule">
+                            <div class="piece-icon red-piece-demo">炮</div>
+                            <div class="piece-desc">
+                                <strong>炮</strong>
+                                <p>移动时与车相同。吃子时必须隔一个棋子（炮架）跳过去。</p>
+                            </div>
+                        </div>
+                        <div class="piece-rule">
+                            <div class="piece-icon red-piece-demo">兵</div>
+                            <div class="piece-desc">
+                                <strong>兵 / 卒</strong>
+                                <p>未过河只能向前走一步。过河后可向前或左右走一步，不能后退。</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="rule-section">
+                    <h3>胜负判定</h3>
+                    <div class="rule-grid">
+                        <div class="rule-item">
+                            <div class="rule-text">
+                                <strong>将死</strong>
+                                <span>一方的将/帅被对方棋子攻击且无法避免被吃。</span>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <div class="rule-text">
+                                <strong>困毙</strong>
+                                <span>一方无子可走（所有棋子均无法移动）。</span>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <div class="rule-text">
+                                <strong>长将/长捉</strong>
+                                <span>连续多次将军或捉子，由裁判判定。本游戏中不限制。</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>历史对局记录</h2>
+                <button id="close-history" class="close-btn">&times;</button>
+            </div>
+            <div id="history-list" class="history-list"></div>
+        </div>
+    </div>
+
+    <div id="message-toast" class="message-toast"></div>
+
+    <script src="game.js"></script>
+</body>
+</html>
