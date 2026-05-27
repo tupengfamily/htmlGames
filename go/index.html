@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>围棋</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>围棋游戏</h1>
+            <div class="game-info">
+                <span id="current-player">黑方回合</span>
+                <span id="captured-stones">黑方提子: 0 | 白方提子: 0</span>
+            </div>
+        </header>
+
+        <div class="game-controls">
+            <button id="pass-btn">停一招 (Pass)</button>
+            <button id="resign-btn">认输 (Resign)</button>
+            <button id="new-game-btn">新游戏</button>
+            <button id="rules-btn">游戏规则</button>
+            <button id="mode-btn">人人对战</button>
+            <select id="difficulty-select" style="display:none;">
+                <option value="easy">简单</option>
+                <option value="medium" selected>中等</option>
+                <option value="hard">困难</option>
+                <option value="hell">地狱</option>
+            </select>
+        </div>
+
+        <div class="board-container">
+            <div id="board" class="board"></div>
+        </div>
+
+        <div id="rules-modal" class="modal">
+            <div class="modal-content">
+                <span id="close-rules" class="close">&times;</span>
+                <h2>围棋游戏规则</h2>
+                <div class="rules-content">
+                    <h3>基本规则</h3>
+                    <ul>
+                        <li><strong>棋盘:</strong> 19×19标准围棋棋盘</li>
+                        <li><strong>棋子:</strong> 黑白两色，黑方先手</li>
+                        <li><strong>落子:</strong> 点击交叉点落子，落子后不能移动</li>
+                    </ul>
+
+                    <h3>气的概念</h3>
+                    <ul>
+                        <li>每个棋子都有"气"，气是指棋子上相邻的空交叉点</li>
+                        <li>当一个棋子的所有气都被对方棋子占据时，该棋子被提掉</li>
+                        <li>相邻的同色棋子共享气</li>
+                    </ul>
+
+                    <h3>提子规则</h3>
+                    <ul>
+                        <li>当对方的棋子在棋盘上没有任何气时，被提掉</li>
+                        <li>每次有效落子后，系统自动检查并提走无气的棋子</li>
+                    </ul>
+
+                    <h3>禁着点 (打劫)</h3>
+                    <ul>
+                        <li><strong>禁着点:</strong> 不能在立即使对方提子的交叉点落子（自杀禁手）</li>
+                        <li><strong>打劫规则:</strong> 提掉对方一子后，不能立即提回对方刚落的子，需在别处落子后才能提回</li>
+                        <li>系统自动判断并禁止非法着法</li>
+                    </ul>
+
+                    <h3>计算胜负</h3>
+                    <ul>
+                        <li>采用国际规则（数子法）</li>
+                        <li>计算双方围住的空交叉点</li>
+                        <li>黑方需还清6.5目的贴目</li>
+                        <li>最终得分 = 围住的空点数 + 理论空点数 - 6.5</li>
+                    </ul>
+
+                    <h3>游戏结束</h3>
+                    <ul>
+                        <li>连续两次停招 (Pass) 表示双方同意终局</li>
+                        <li>也可以选择认输结束游戏</li>
+                        <li>终局后自动计算胜负</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-over-modal" class="modal">
+            <div class="modal-content">
+                <h2>游戏结束</h2>
+                <p id="game-result"></p>
+                <button id="play-again-btn">再来一局</button>
+            </div>
+        </div>
+
+        <div id="confirm-modal" class="modal">
+            <div class="modal-content">
+                <h2>确认新游戏</h2>
+                <p>确定要开始新游戏吗？当前对局进度将丢失。</p>
+                <div class="confirm-buttons">
+                    <button id="confirm-yes">确定</button>
+                    <button id="confirm-no">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
