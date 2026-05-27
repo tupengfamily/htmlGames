@@ -22,7 +22,7 @@
             <button id="new-game-btn">新游戏</button>
             <button id="rules-btn">游戏规则</button>
             <button id="mode-btn">人人对战</button>
-            <select id="difficulty-select" style="display:none;">
+            <select id="difficulty-select" class="hidden">
                 <option value="easy">简单</option>
                 <option value="medium" selected>中等</option>
                 <option value="hard">困难</option>
@@ -35,51 +35,108 @@
         </div>
 
         <div id="rules-modal" class="modal">
-            <div class="modal-content">
+            <div class="modal-content rules-modal-wide">
                 <span id="close-rules" class="close">&times;</span>
-                <h2>围棋游戏规则</h2>
+                <h2>围棋游戏规则 — 新手入门指南</h2>
                 <div class="rules-content">
-                    <h3>基本规则</h3>
-                    <ul>
-                        <li><strong>棋盘:</strong> 19×19标准围棋棋盘</li>
-                        <li><strong>棋子:</strong> 黑白两色，黑方先手</li>
-                        <li><strong>落子:</strong> 点击交叉点落子，落子后不能移动</li>
-                    </ul>
 
-                    <h3>气的概念</h3>
-                    <ul>
-                        <li>每个棋子都有"气"，气是指棋子上相邻的空交叉点</li>
-                        <li>当一个棋子的所有气都被对方棋子占据时，该棋子被提掉</li>
-                        <li>相邻的同色棋子共享气</li>
-                    </ul>
+                    <div class="rules-section">
+                        <h3>一、什么是围棋？</h3>
+                        <p>围棋是起源于中国、已有4000多年历史的策略棋类游戏。双方轮流在棋盘交叉点上落子，通过围地来争夺胜负。围棋规则极其简单，但策略深度无穷，被誉为"人类智慧的巅峰"。</p>
+                    </div>
 
-                    <h3>提子规则</h3>
-                    <ul>
-                        <li>当对方的棋子在棋盘上没有任何气时，被提掉</li>
-                        <li>每次有效落子后，系统自动检查并提走无气的棋子</li>
-                    </ul>
+                    <div class="rules-section">
+                        <h3>二、棋盘与棋子</h3>
+                        <ul>
+                            <li><strong>棋盘：</strong>标准19×19围棋棋盘，共361个交叉点（本游戏使用标准棋盘）</li>
+                            <li><strong>棋子：</strong>黑棋和白棋，<strong>黑方先行</strong>，双方轮流落子</li>
+                            <li><strong>落子：</strong>棋子放在<strong>交叉点上</strong>（不是方格内！），落子后不可移动</li>
+                            <li><strong>星位：</strong>棋盘上9个黑点标记，是重要的参考点，通常开局先占角部星位</li>
+                        </ul>
+                    </div>
 
-                    <h3>禁着点 (打劫)</h3>
-                    <ul>
-                        <li><strong>禁着点:</strong> 不能在立即使对方提子的交叉点落子（自杀禁手）</li>
-                        <li><strong>打劫规则:</strong> 提掉对方一子后，不能立即提回对方刚落的子，需在别处落子后才能提回</li>
-                        <li>系统自动判断并禁止非法着法</li>
-                    </ul>
+                    <div class="rules-section">
+                        <h3>三、气的概念 (核心！)</h3>
+                        <p><strong>"气"</strong>是围棋最重要的概念：指一颗棋子在棋盘上<strong>相邻的空交叉点</strong>（上下左右四个方向，不含斜对角）。</p>
+                        <ul>
+                            <li>棋盘中央的单颗棋子有<strong>4口气</strong></li>
+                            <li>边上的单颗棋子有<strong>3口气</strong></li>
+                            <li>角上的单颗棋子有<strong>2口气</strong></li>
+                            <li><strong>连接的同色棋子共享气</strong>——多颗相邻同色棋子算一个整体</li>
+                            <li>当一组棋子的<strong>所有气都被对方棋子堵住</strong>时，这组棋子就被"提掉"（从棋盘上移除）</li>
+                        </ul>
+                    </div>
 
-                    <h3>计算胜负</h3>
-                    <ul>
-                        <li>采用国际规则（数子法）</li>
-                        <li>计算双方围住的空交叉点</li>
-                        <li>黑方需还清6.5目的贴目</li>
-                        <li>最终得分 = 围住的空点数 + 理论空点数 - 6.5</li>
-                    </ul>
+                    <div class="rules-section">
+                        <h3>四、提子规则 (吃子)</h3>
+                        <p>落下一子后，系统会自动检查对方棋子的气：</p>
+                        <ul>
+                            <li>如果<strong>对方</strong>某组棋子的气变为0（被完全围住）→ 对方棋子被<strong>提掉</strong></li>
+                            <li>提掉的棋子从棋盘上移除，成为己方的"提子"</li>
+                            <li>每提掉对方一子，相当于多了<strong>1目</strong>的优势</li>
+                        </ul>
+                        <p class="rules-tip">新手tip：先确保自己的棋子有气，再考虑攻击对方。不要贸然送子！</p>
+                    </div>
 
-                    <h3>游戏结束</h3>
-                    <ul>
-                        <li>连续两次停招 (Pass) 表示双方同意终局</li>
-                        <li>也可以选择认输结束游戏</li>
-                        <li>终局后自动计算胜负</li>
-                    </ul>
+                    <div class="rules-section">
+                        <h3>五、禁着点与打劫</h3>
+                        <ul>
+                            <li><strong>自杀禁手：</strong>不能下在没有气且不能提掉对方棋子的位置（走进去自己的棋子立刻无气）</li>
+                            <li><strong>打劫规则 (Ko)：</strong>当双方能互相反复提掉对方一子时，<strong>不能立即提回</strong>，必须先在别处落一子后才能回来提</li>
+                            <li>本游戏系统自动判断禁着点和打劫，若你点了禁止位置会弹出提示</li>
+                        </ul>
+                    </div>
+
+                    <div class="rules-section">
+                        <h3>六、胜负判定 (重要！)</h3>
+                        <p>本游戏采用<strong>国际规则（数子法）</strong>，计算方式如下：</p>
+
+                        <h4>1. 什么是"目"？</h4>
+                        <p>"目"是围棋中计算得失的单位：</p>
+                        <ul>
+                            <li>棋盘上每个被己方<strong>完全包围的空交叉点</strong> = <strong>1目</strong></li>
+                            <li>每提掉对方<strong>1颗棋子</strong> = <strong>1目</strong></li>
+                            <li><strong>目数越多越好！</strong></li>
+                        </ul>
+
+                        <h4>2. 胜负计算公式</h4>
+                        <ul>
+                            <li><strong>黑方总目数</strong> = 黑方围住的空点（地） + 棋盘上黑子数</li>
+                            <li><strong>白方总目数</strong> = 白方围住的空点（地） + 棋盘上白子数 + <strong>贴目6.5目</strong></li>
+                            <li><strong>贴目：</strong>因为黑方先手有优势，所以白方额外加<strong>6.5目</strong>作为补偿（0.5目避免平局）</li>
+                            <li>总目数<strong>多者获胜</strong></li>
+                        </ul>
+
+                        <h4>3. 举例说明</h4>
+                        <p>假设终局时：</p>
+                        <ul>
+                            <li>黑方围了50个空点 + 棋盘上40颗黑子 = <strong>90目</strong></li>
+                            <li>白方围了45个空点 + 棋盘上38颗白子 + 6.5贴目 = <strong>89.5目</strong></li>
+                            <li>黑方90目 &gt; 白方89.5目 → <strong>黑方胜0.5目</strong></li>
+                        </ul>
+                        <p class="rules-tip">新人tip：不用死记公式，只需记住——多围空、多吃子、少被吃，终局比目数！</p>
+                    </div>
+
+                    <div class="rules-section">
+                        <h3>七、棋局结束</h3>
+                        <ul>
+                            <li><strong>双方停招：</strong>双方连续各停一招 (点击Pass按钮)，表示都认为没有有价值的落子点了，棋局结束</li>
+                            <li><strong>认输：</strong>任一方可以点击"认输"按钮立即结束棋局</li>
+                            <li>终局后系统自动计算双方目数并宣布胜负</li>
+                        </ul>
+                    </div>
+
+                    <div class="rules-section">
+                        <h3>八、新手快速入门策略</h3>
+                        <ol>
+                            <li><strong>先占角、后占边、再中腹</strong>——角落最容易围地，效率最高</li>
+                            <li><strong>保持棋子连接</strong>——连在一起的棋子不容易被吃</li>
+                            <li><strong>注意气的数量</strong>——不要让棋子只剩1口气（叫"被打吃"）</li>
+                            <li><strong>两眼活棋</strong>——一组棋子需要至少两只"眼"（对方无法填满的独立空点）才能确保不被吃</li>
+                            <li><strong>围空比吃子更重要</strong>——初学者容易沉迷吃子，但最终比的是围地面积</li>
+                        </ol>
+                    </div>
+
                 </div>
             </div>
         </div>

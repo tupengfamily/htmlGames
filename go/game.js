@@ -63,7 +63,7 @@ class GoGame {
             if (this.aiPlayer && this.currentPlayer === this.aiPlayer && !this.gameOver) {
                 this.scheduleAIMove();
             }
-        } catch (e) {
+        } catch {
             this.initBoard();
         }
     }
@@ -82,13 +82,15 @@ class GoGame {
             moveNumber: this.moveNumber,
             gameMode: this.gameMode,
             aiPlayer: this.aiPlayer,
-            difficulty: this.difficulty
+            difficulty: this.difficulty,
         };
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
     }
 
     initBoard() {
         this.renderBoard();
+        this.updateUI();
+        this.updateModeButton();
     }
 
     setupEventListeners() {
@@ -125,15 +127,25 @@ class GoGame {
 
     updateModeButton() {
         const btn = document.getElementById('mode-btn');
-        btn.textContent = this.gameMode === 'ai' ? '人机对战' : '人人对战';
+        if (this.gameMode === 'ai') {
+            btn.textContent = '切换为: 人人对战';
+            btn.classList.remove('mode-pvp');
+            btn.classList.add('mode-ai');
+        } else {
+            btn.textContent = '切换为: 人机对战';
+            btn.classList.remove('mode-ai');
+            btn.classList.add('mode-pvp');
+        }
         this.updateDifficultyVisibility();
     }
 
     updateDifficultyVisibility() {
         const select = document.getElementById('difficulty-select');
-        select.style.display = this.gameMode === 'ai' ? 'inline-block' : 'none';
         if (this.gameMode === 'ai') {
+            select.classList.remove('hidden');
             select.value = this.difficulty;
+        } else {
+            select.classList.add('hidden');
         }
     }
 
@@ -142,14 +154,9 @@ class GoGame {
             if (!confirm('切换模式将开始新游戏，确定吗？')) return;
         }
         this.clearStorage();
+        this.gameMode = this.gameMode === 'pvp' ? 'ai' : 'pvp';
         this.resetState();
-        if (this.gameMode === 'pvp') {
-            this.gameMode = 'ai';
-            this.aiPlayer = 'white';
-        } else {
-            this.gameMode = 'pvp';
-            this.aiPlayer = null;
-        }
+        this.aiPlayer = this.gameMode === 'ai' ? 'white' : null;
         this.updateModeButton();
         this.renderBoard();
         this.updateUI();
@@ -166,10 +173,15 @@ class GoGame {
 
     startNewGame() {
         this.clearStorage();
+        const savedMode = this.gameMode;
+        const savedDifficulty = this.difficulty;
         this.resetState();
-        this.aiPlayer = this.gameMode === 'ai' ? 'white' : null;
+        this.gameMode = savedMode;
+        this.difficulty = savedDifficulty;
+        this.aiPlayer = savedMode === 'ai' ? 'white' : null;
         this.renderBoard();
         this.updateUI();
+        this.updateModeButton();
         this.saveGame();
     }
 
@@ -282,7 +294,6 @@ class GoGame {
         const captures = this.findCapturedStones(opponent);
 
         if (captures.length > 0) {
-            const capturedPositions = captures.map(([r, c]) => ({ r, c }));
             captures.forEach(([r, c]) => { this.board[r][c] = null; });
             const liberties = this.getGroupLiberties(row, col);
             if (liberties < 1) {
@@ -292,7 +303,7 @@ class GoGame {
             }
             captures.forEach(([r, c]) => { this.board[r][c] = opponent; });
             this.board[row][col] = null;
-            return { valid: true, captures: capturedPositions.length, liberties };
+            return { valid: true, captures: captures.length, liberties };
         }
 
         const liberties = this.getGroupLiberties(row, col);
@@ -553,7 +564,6 @@ class GoGame {
         const scored = this.scoreMoves(moves, player, opponent, 1.5);
 
         for (const m of scored) {
-            const selfGroup = this.getGroupAfterTest(m.row, m.col, player);
             const oppNearby = this.countNearbyOpponent(m.row, m.col, opponent);
             if (this.moveNumber > 30 && oppNearby === 0 && m.captures === 0) {
                 m.score -= 30;
@@ -581,7 +591,6 @@ class GoGame {
         const scored = this.scoreMoves(moves, player, opponent, 2);
 
         for (const m of scored) {
-            const selfGroup = this.getGroupAfterTest(m.row, m.col, player);
             const oppNearby = this.countNearbyOpponent(m.row, m.col, opponent);
             if (this.moveNumber > 20 && oppNearby === 0 && m.captures === 0) {
                 m.score -= 40;
@@ -849,12 +858,17 @@ class GoGame {
 
     updateUI() {
         const playerEl = document.getElementById('current-player');
-        const modeLabel = this.gameMode === 'ai' && this.currentPlayer === this.aiPlayer ? ' (AI)' : '';
-        playerEl.textContent = `${this.currentPlayer === 'black' ? '黑方' : '白方'}回合${modeLabel}`;
+        const aiTurn = this.gameMode === 'ai' && this.currentPlayer === this.aiPlayer;
+        const colorName = this.currentPlayer === 'black' ? '黑方' : '白方';
+        playerEl.textContent = aiTurn ? `${colorName}回合 (AI思考中...)` : `${colorName}回合`;
         playerEl.className = this.currentPlayer === 'black' ? 'black-turn' : 'white-turn';
 
         const capturedEl = document.getElementById('captured-stones');
         capturedEl.textContent = `黑方提子: ${this.capturedByBlack} | 白方提子: ${this.capturedByWhite}`;
+
+        const isAIThinking = aiTurn && !this.gameOver;
+        document.getElementById('pass-btn').disabled = isAIThinking;
+        document.getElementById('resign-btn').disabled = isAIThinking;
     }
 
     showRules() {
